@@ -1,0 +1,15 @@
+name: 'Post2BlueSky'
+description: 'Send notifications to BlueSky social media for new content updates.'
+branding:
+  icon: 'bell'
+  color: 'blue'
+
+inputs:
+  message:
+    description: 'Message to be posted on BlueSky'
+    required: true
+    default: ''
+
+runs:
+  using: 'python'
+  main: 'post2bsky.py'
