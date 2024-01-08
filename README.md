@@ -101,4 +101,4 @@ For support, questions, or feature requests, please open an issue in the GitHub 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Gnu GPL-3](LICENSE).
