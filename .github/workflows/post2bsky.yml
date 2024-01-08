@@ -1,0 +1,34 @@
+name: BlueSky Notification Workflow
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        required: true
+        type: string
+    secrets:
+      bluesky_api_key:
+        required: true
+      bluesky_identifier:
+        required: true
+
+jobs:
+  notify_bluesky:
+    runs-on: ubuntu-latest
+    name: Send notification to BlueSky
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Send BlueSky Notification
+        env:
+          BLUESKY_API_KEY: ${{ secrets.bluesky_api_key }}
+          BLUESKY_IDENTIFIER: ${{ secrets.bluesky_identifier }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          python3 post2bsky.py $BLUESKY_API_KEY $BLUESKY_IDENTIFIER "$MESSAGE"
