@@ -1,5 +1,7 @@
 name: 'Post2BlueSky'
 description: 'Send notifications to BlueSky social media for new content updates.'
+author: 'Jeff Patton'
+
 branding:
   icon: 'bell'
   color: 'blue'
