@@ -45,7 +45,7 @@ To use these secrets in your GitHub Actions workflows, refer to them by their na
 ```yaml
 jobs:
   notify_bluesky:
-    uses: jeffpatton1971/Post2Bluesky@v1
+    uses: jeffpatton1971/Post2Bluesky@v0.0.1.3
     with:
       message: "New blog post published!"
     env:
