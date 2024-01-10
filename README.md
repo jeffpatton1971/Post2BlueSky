@@ -1,104 +1,58 @@
-# Post2BlueSky GitHub Action
+# BlueSky Notification Workflow
 
 ## Overview
 
-Post2BlueSky is a GitHub Action designed to send notifications to BlueSky social media whenever new content is published. It's particularly useful for automated blog post updates.
+This repository contains a PowerShell script, a GitHub Actions workflow, and a GitHub Action metadata file designed to send notifications to BlueSky social media for new content updates. The workflow is triggered when called from another workflow in your repository, sending information about the latest updates in your project to BlueSky.
 
-## Requirements
+## Components
 
-- GitHub repository with GitHub Actions enabled.
-- BlueSky API key and Identifier.
+- `post2bsky.ps1`: A PowerShell script that sends a notification to BlueSky with details about the latest version of a project, either a PowerShell module (.psd1) or a C# project (.csproj).
+- `post2bsky.yml`: A GitHub Actions workflow file that defines the steps to send notifications to BlueSky.
+- `action.yml`: Metadata for the GitHub Action, describing inputs, secrets, and branding.
 
-## Setting Up Secrets
+## Setup
 
-Before using this action, you need to set up the following secrets in your GitHub repository:
+1. **GitHub Secrets**: Set up the following secrets in your GitHub repository:
+   - `bluesky_api_key`: Your BlueSky App Password.
+   - `bluesky_identifier`: Your BlueSky Identifier, like `user.bsky.social`.
 
-- `BLUESKY_API_KEY`: Your BlueSky API key.
-- `BLUESKY_IDENTIFIER`: Your BlueSky identifier.
-
-## Setting Up and Using Secrets in GitHub
-
-### What are GitHub Secrets?
-
-GitHub Secrets allow you to store sensitive information in your GitHub repository. These secrets are encrypted and can be used in GitHub Actions workflows without exposing them in your logs.
-
-### Creating Secrets in Your Repository
-
-1. **Navigate to Your Repository**: Go to the GitHub repository where you want to use the action.
-
-2. **Access Repository Settings**: Click on the "Settings" tab of your repository.
-
-3. **Open Secrets Section**: In the left sidebar, click on "Secrets". Here, you will manage all secrets for your repository.
-
-4. **Add a New Secret**:
-   - Click on "New repository secret".
-   - Enter a name for your secret in the "Name" field. For example, `BLUESKY_API_KEY` or `BLUESKY_IDENTIFIER`.
-   - In the "Value" field, enter the sensitive data or token.
-   - Click "Add secret" to save the secret.
-
-### Using Secrets in Your Workflows
-
-To use these secrets in your GitHub Actions workflows, refer to them by their names in the `env` or `with` section of your workflow file. Secrets are referenced using the `${{ secrets.SECRET_NAME }}` syntax.
-
-#### Example Usage
-
-```yaml
-jobs:
-  notify_bluesky:
-    uses: jeffpatton1971/Post2Bluesky@v0.0.1.3
-    with:
-      message: "New blog post published!"
-    env:
-      BLUESKY_API_KEY: ${{ secrets.BLUESKY_API_KEY }}
-      BLUESKY_IDENTIFIER: ${{ secrets.BLuesky_Identifier }}
-```
-
-### Best Practices for Secrets
-
-- **Never Hardcode Secrets**: Avoid hardcoding secrets directly in your code or workflow files.
-- **Limit Access**: Only grant access to secrets to those who absolutely need it.
-- **Audit and Rotate**: Regularly review and update your secrets.
-
-By following these steps, you can securely manage sensitive information for your GitHub Actions.
+2. **Action Configuration**:
+   - Edit `action.yml` to customize the description, author, branding, inputs, and secrets per your requirements.
 
 ## Usage
 
-To use this action in your workflow, create a `.yml` file (if you haven't already) in your `.github/workflows` directory in your GitHub repository.
+1. **Integration in Your Workflow**:
+   - To use this action, include it in your workflow with the necessary inputs and secrets.
+   - Example usage in a workflow:
 
-Here's a basic example of how to use this action:
+     ```yaml
+     jobs:
+       notify_bluesky:
+         runs-on: windows-latest
+         steps:
+           - name: Checkout Repository
+             uses: actions/checkout@v2
+           - name: Send BlueSky Notification
+             uses: ./.github/actions/post2bsky
+             with:
+               source: 'path/to/your/project/file'
+               projectName: 'Your Project Name'
+             secrets:
+               bluesky_api_key: ${{ secrets.bluesky_api_key }}
+               bluesky_identifier: ${{ secrets.bluesky_identifier }}
+     ```
 
-```yaml
-name: Blog Update Workflow
+2. **Script Details** (`post2bsky.ps1`):
+   - The script requires four parameters: `Source`, `ProjectName`, `Identifier`, and `Password`.
+   - It handles different project types (.psd1 for PowerShell modules and .csproj for C# projects) and sends a formatted notification to BlueSky.
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  notify_bluesky:
-    uses: jeffpatton1971/Post2Bluesky@v1
-    with:
-      message: "New blog post published!"
-    secrets:
-      bluesky_api_key: ${{ secrets.BLUESKY_API_KEY }}
-      bluesky_identifier: ${{ secrets.BLuesky_Identifier }}
-```
-
-In this example, when you push to the `main` branch, the action will trigger and send a notification to BlueSky.
-
-## Python Script
-
-The `post2bsky.py` Python script is used by this action to perform the actual notification. It takes the API key, identifier, and the message as input to send the post to BlueSky.
+3. **GitHub Action Metadata** (`action.yml`):
+   - Specifies the action's name, description, required inputs, and secrets.
 
 ## Contributing
 
-Contributions to the Post2BlueSky action are welcome! Please read our contributing guidelines and submit pull requests for any enhancements.
-
-## Support
-
-For support, questions, or feature requests, please open an issue in the GitHub repository.
+Feel free to fork this repository and submit pull requests to enhance the functionalities of this GitHub Action.
 
 ## License
 
-This project is licensed under the [Gnu GPL-3](LICENSE).
+This project is licensed using the [Gnu GPL-3](LICENSE).

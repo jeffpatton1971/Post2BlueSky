@@ -7,11 +7,26 @@ branding:
   color: 'blue'
 
 inputs:
-  message:
-    description: 'Message to be posted on BlueSky'
+  source:
+    description: 'The path to the project file (either .psd1 or .csproj).'
     required: true
-    default: ''
-
+  projectName:
+    description: 'The name of the project, used in the notification message.'
+    required: true
+secrets:
+  bluesky_api_key:
+    description: 'Your BlueSky App Password'
+    required: true
+  bluesky_identifier:
+    description: 'Your BlueSky Identifier, something like user.bsky.social'
+    required: true
 runs:
-  using: 'python'
-  main: 'post2bsky.py'
+  using: 'composite'
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Send BlueSky Notification
+      run: |
+        pwsh -File post2bsky.ps1 -Source ${{ inputs.source }} -ProjectName ${{ inputs.projectName }} -Identifier ${{ secrets.bluesky_identifier }} -Password ${{ secrets.bluesky_api_key }}
+      shell: pwsh
