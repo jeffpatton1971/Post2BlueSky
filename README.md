@@ -33,7 +33,7 @@ This repository contains a PowerShell script, a GitHub Actions workflow, and a G
            - name: Checkout Repository
              uses: actions/checkout@v2
            - name: Send BlueSky Notification
-             uses: ./.github/actions/post2bsky
+             uses: mod-posh/Post2BlueSky@v0.0.2.0
              with:
                source: 'path/to/your/project/file'
                projectName: 'Your Project Name'
