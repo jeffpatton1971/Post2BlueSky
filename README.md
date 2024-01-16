@@ -20,9 +20,8 @@ You can trigger the `action.yml` by `workflow_call` to post a notification autom
 
 ### Workflow Inputs
 
-- `Message`: The message to post
+- `Message`: The message to post, for links use github [markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#links)
 - `verbose`: A value of verbose will output additional information
-- `Link`: A url to link to, or a comma separated list of links
 - `bluesky_api_key`: Your BlueSky App Password
 - `bluesky_identifier`: Your BlueSky Identifier, something like user.bsky.social
 
@@ -37,10 +36,9 @@ There a few different ways you could use this action, here is an example of one 
 ```yaml
 jobs:
   send_notification:
-    uses: mod-posh/Post2BlueSky@v0.0.2.5
+    uses: mod-posh/Post2BlueSky@v0.0.2.6
     with:
-      message: '"This is a test post with a link to github"'
-      link: 'https://www.github.com'
+      message: '"This is a test post with a link to [github](https://www.github.com)"'
       verbose: 'verbose'
       bluesky_api_key: ${{ secrets.bluesky_api_key }}
       bluesky_identifier: ${{ secrets.bluesky_identifier }}

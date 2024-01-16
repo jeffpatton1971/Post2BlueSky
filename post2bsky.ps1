@@ -1,6 +1,5 @@
 param (
- [string]$Message,
- [string]$Link
+ [string]$Message
 )
 try
 {
@@ -35,37 +34,61 @@ try
  $Headers.Add('Authorization', "Bearer $($Response.accessJwt)")
 
  $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
+ $MarkdownLinkPattern = '\[([^\]]+)\]\((http[s]?://[^\s,)]+)\)'
+ $LinkMatches = Select-String -Pattern $MarkdownLinkPattern -InputObject $Message -AllMatches | ForEach-Object { $_.Matches }
 
- $Record = New-Object -TypeName psobject -Property @{
-  '$type'     = "app.bsky.feed.post"
-  'text'      = $Message
-  "createdAt" = $createdAt
- }
-
- if ($Links)
+ if ($LinkMatches)
  {
-  $embeds = @()
-  foreach ($uri in $Link.Split(','))
+  $Links = @()
+  foreach ($Match in $LinkMatches)
   {
-   $embeds += New-Object -TypeName psobject -Property @{
-    '$type' = 'app.bsky.embed.link'
-    'url'   = $uri
+   $startIndex = $Match.Index
+   $endIndex = $Match.Index + $Match.Length - 1
+   $Links += New-Object -TypeName psobject -Property @{
+    Name         = $Match.Groups[1].Value
+    Url          = $Match.Groups[2].Value
+    "StartIndex" = $startIndex
+    "EndIndex"   = $endIndex
    }
   }
-  $Post = New-Object -TypeName psobject -Property @{
-   'repo'       = $Identifier
-   'collection' = 'app.bsky.feed.post'
-   record       = $Record
-   embeds       = $embeds
+
+  $Facets = @()
+  foreach ($Link in $Links)
+  {
+   $features = @()
+   $features += New-Object -TypeName psobject -Property @{
+    '$type' = "app.bsky.richtext.facet#link"
+    'uri'   = $Link.Url
+   }
+   $index = New-Object -TypeName psobject -Property @{
+    "byteStart" = $Link.startIndex
+    "byteEnd"   = $Link.endIndex
+   }
+   $Facets += New-Object -TypeName psobject -Property @{
+    'index'    = $index
+    'features' = $features
+   }
+  }
+  $Record = New-Object -TypeName psobject -Property @{
+   '$type'     = "app.bsky.feed.post"
+   'text'      = $Message
+   "createdAt" = $createdAt
+   'facets'    = $Facets
   }
  }
  else
  {
-  $Post = New-Object -TypeName psobject -Property @{
-   'repo'       = $Identifier
-   'collection' = 'app.bsky.feed.post'
-   record       = $Record
+  $Record = New-Object -TypeName psobject -Property @{
+   '$type'     = "app.bsky.feed.post"
+   'text'      = $Message
+   "createdAt" = $createdAt
   }
+ }
+
+ $Post = New-Object -TypeName psobject -Property @{
+  'repo'       = $Identifier
+  'collection' = 'app.bsky.feed.post'
+  record       = $Record
  }
 
  Invoke-RestMethod -Uri $CreateRecordUri -Method Post -Body ($Post | ConvertTo-Json -Depth 10 -Compress) -Headers $Headers

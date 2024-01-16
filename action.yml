@@ -11,10 +11,6 @@ inputs:
     description: 'The message to post, should either be plaintext, or bsky record, or bsky record containing a bsky repo'
     required: true
     type: string
-  Link:
-    description: 'One ore more comma separated links'
-    required: false
-    type: string
   verbose:
     description: "A value of verbose will output additional information"
     required: false
