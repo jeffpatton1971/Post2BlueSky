@@ -23,7 +23,7 @@ try
   Write-Host "Post2BlueSkey DEBUG"
   Write-Host "CreateSessionUri : $($CreateSessionUri)"
   Write-Host "CreateRecordUri  : $($CreateRecordUri)"
-  Write-Host "Post             : $($Post)"
+  Write-Host "Message          : $($Message)"
  }
 
  $AuthBody = @{'identifier' = $Identifier; 'password' = $ApiKey }
