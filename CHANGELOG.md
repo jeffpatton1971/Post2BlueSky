@@ -13,6 +13,7 @@ This is a breaking change from previous versions, I have moved from Python to Po
 - action.yml: Updated to work with PowerShell script.
 
 ---
+
 ## [[0.0.2.5]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.5) - 2024-01-16
 
 This is a functional change, the Action now only posts a message, with an optional link(s)
