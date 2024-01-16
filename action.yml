@@ -16,7 +16,6 @@ inputs:
     required: false
     type: string
     default: 'None'
-secrets:
   bluesky_api_key:
     description: 'Your BlueSky App Password'
     required: true
@@ -32,8 +31,8 @@ runs:
 
     - name: Send BlueSky Notification
       env:
-          BLUESKY_API_KEY: ${{ secrets.bluesky_api_key }}
-          BLUESKY_IDENTIFIER: ${{ secrets.bluesky_identifier }}
+          BLUESKY_API_KEY: ${{ inputs.bluesky_api_key }}
+          BLUESKY_IDENTIFIER: ${{ inputs.bluesky_identifier }}
       run: |
         & $env:GITHUB_ACTION_PATH\\post2bsky.ps1 -Message ${{ inputs.Message }}
       shell: pwsh
