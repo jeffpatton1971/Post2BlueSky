@@ -33,6 +33,7 @@ runs:
       env:
           BLUESKY_API_KEY: ${{ inputs.bluesky_api_key }}
           BLUESKY_IDENTIFIER: ${{ inputs.bluesky_identifier }}
+          VERBOSE: ${{ inputs.verbose }}
       run: |
         & $env:GITHUB_ACTION_PATH\\post2bsky.ps1 -Message ${{ inputs.Message }}
       shell: pwsh
