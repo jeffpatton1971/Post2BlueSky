@@ -1,57 +1,52 @@
-# BlueSky Notification Workflow
+# BlueSky Notification GitHub Action
 
 ## Overview
 
-This repository contains a PowerShell script, a GitHub Actions workflow, and a GitHub Action metadata file designed to send notifications to BlueSky social media for new content updates. The workflow is triggered when called from another workflow in your repository, sending information about the latest updates in your project to BlueSky.
-
-## Components
-
-- `post2bsky.ps1`: A PowerShell script that sends a notification to BlueSky with details about the latest version of a project, either a PowerShell module (.psd1) or a C# project (.csproj).
-- `post2bsky.yml`: A GitHub Actions workflow file that defines the steps to send notifications to BlueSky.
-- `action.yml`: Metadata for the GitHub Action, describing inputs, secrets, and branding.
+The "Post2Bluesky" Github Action posts a message to your Bsky social account. You can use this for project update notifications, new releases, or just an easy way to post a message. The workflow accepts a plain-text message or a JSON string comprised of at least [bsky record](https://atproto.com/blog/create-post#post-record-structure).
 
 ## Setup
 
-1. **GitHub Secrets**: Set up the following secrets in your GitHub repository:
-   - `bluesky_api_key`: Your BlueSky App Password.
-   - `bluesky_identifier`: Your BlueSky Identifier, like `user.bsky.social`.
+**GitHub Secrets**: Set up the following secrets in your GitHub repository:
 
-2. **Action Configuration**:
-   - Edit `action.yml` to customize the description, author, branding, inputs, and secrets per your requirements.
+- `bluesky_api_key`: Your BlueSky App Password.
+- `bluesky_identifier`: Your BlueSky Identifier, like `user.bsky.social`.
+
+## Workflow File
+
+You can trigger the `action.yml` by `workflow_call` to post a notification automatically. The workflow contains several steps to act:
+
+1. Checkout the repository
+2. Call the `post2bsky.ps1` script
+
+### Workflow Inputs
+
+- `Message`: The message to post, should either be plaintext, or bsky record, or bsky record containing a bsky repo
+- `verbose`: A value of verbose will output additional information
+- `bluesky_api_key`: Your BlueSky App Password
+- `bluesky_identifier`: Your BlueSky Identifier, something like user.bsky.social
+
+## PowerShell Script (`issue2releasenotes.ps1`)
+
+The PowerShell script constructs an authentication package to authenticate into the API. Once it has authenticated, it checks to see if the `Message` is a proper bsky record with repo or if it's a plain-text message. If it's a proper message it is posted; if it's missing a repo, one is constructed, and then the message is posted; and finally, if it's just a plain-text message, a record and repo are created and posted for you.
 
 ## Usage
 
-1. **Integration in Your Workflow**:
-   - To use this action, include it in your workflow with the necessary inputs and secrets.
-   - Example usage in a workflow:
+There a few different ways you could use this action, here is an example of one way to get you started.
 
-     ```yaml
-     jobs:
-       notify_bluesky:
-         runs-on: windows-latest
-         steps:
-           - name: Checkout Repository
-             uses: actions/checkout@v2
-           - name: Send BlueSky Notification
-             uses: mod-posh/Post2BlueSky@v0.0.2.0
-             with:
-               source: 'path/to/your/project/file'
-               projectName: 'Your Project Name'
-             secrets:
-               bluesky_api_key: ${{ secrets.bluesky_api_key }}
-               bluesky_identifier: ${{ secrets.bluesky_identifier }}
-     ```
+```yaml
+jobs:
+  send_notification:
+    uses: mod-posh/Post2BlueSky@v0.0.2.1
+    with:
+      message: 'This is a test post'
+      verbose: 'verbose'
+      bluesky_api_key: ${{ secrets.bluesky_api_key }}
+      bluesky_identifier: ${{ secrets.bluesky_identifier }}
+```
 
-2. **Script Details** (`post2bsky.ps1`):
-   - The script requires four parameters: `Source`, `ProjectName`, `Identifier`, and `Password`.
-   - It handles different project types (.psd1 for PowerShell modules and .csproj for C# projects) and sends a formatted notification to BlueSky.
-
-3. **GitHub Action Metadata** (`action.yml`):
-   - Specifies the action's name, description, required inputs, and secrets.
-
-## Contributing
-
-Feel free to fork this repository and submit pull requests to enhance the functionalities of this GitHub Action.
+> [!Note]
+> This example is used directly as part of a larger workflow
+> The verbose option will output a little more detail in the logs
 
 ## License
 

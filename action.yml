@@ -7,12 +7,15 @@ branding:
   color: 'blue'
 
 inputs:
-  source:
-    description: 'The path to the project file (either .psd1 or .csproj).'
+  Message:
+    description: 'The message to post, should either be plaintext, or bsky record, or bsky record containing a bsky repo'
     required: true
-  projectName:
-    description: 'The name of the project, used in the notification message.'
-    required: true
+    type: string
+  verbose:
+    description: "A value of verbose will output additional information"
+    required: false
+    type: string
+    default: 'None'
 secrets:
   bluesky_api_key:
     description: 'Your BlueSky App Password'
@@ -20,13 +23,17 @@ secrets:
   bluesky_identifier:
     description: 'Your BlueSky Identifier, something like user.bsky.social'
     required: true
+
 runs:
   using: 'composite'
   steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Send BlueSky Notification
+      env:
+          BLUESKY_API_KEY: ${{ secrets.bluesky_api_key }}
+          BLUESKY_IDENTIFIER: ${{ secrets.bluesky_identifier }}
       run: |
-        pwsh -File post2bsky.ps1 -Source ${{ inputs.source }} -ProjectName ${{ inputs.projectName }} -Identifier ${{ secrets.bluesky_identifier }} -Password ${{ secrets.bluesky_api_key }}
+        & $env:GITHUB_ACTION_PATH\\post2bsky.ps1 -Message ${{ inputs.Message }}
       shell: pwsh

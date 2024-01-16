@@ -1,80 +1,86 @@
 param (
- [string]$Source,
- [string]$ProjectName,
- [string]$Identifier,
- [string]$Password
+ [string]$Message
 )
 try
 {
  $ErrorActionPreference = 'Stop';
  $Error.Clear();
 
- $SourcePath = Get-Item -Path $Source;
- $GitHubRepoUrl = "https://github.com/$($env:GITHUB_REPOSITORY)"
+ $verbose = $env:VERBOSE
+ $Identifier = $env:BLUESKY_IDENTIFIER
+ $ApiKey = $env:BLUESKY_API_KEY
 
- $AuthBody = @{'identifier' = $Identifier; 'password' = $Password }
- $Headers = @{}
- $Headers.Add('Content-Type', 'application/json')
- $Response = Invoke-RestMethod -Uri "https://bsky.social/xrpc/com.atproto.server.createSession" -Method Post -Body ($AuthBody | ConvertTo-Json -Compress) -Headers $Headers
- $Headers.Add('Authorization', "Bearer $($Response.accessJwt)")
- 
- $embeds = @()
- $embeds += New-Object -TypeName psobject -Property @{
-  '$type'       = 'app.bsky.embed.link'
-  'url'         = $GitHubRepoUrl
-  'title'       = "Github.com $($script:ProjectName)"
-  'description' = $project.Project.PropertyGroup.Description
+ $baseUri = 'https://bsky.social'
+ $protocol = 'xrpc'
+ $createSession = 'com.atproto.server.createSession'
+ $createRecord = 'com.atproto.repo.createRecord'
+
+ $CreateSessionUri = "$($baseUri)/$($protocol)/$($createSession)"
+ $CreateRecordUri = "$($baseUri)/$($protocol)/$($createRecord)"
+
+ if ($verbose.ToLower() -eq 'verbose')
+ {
+  Write-Host "Post2BlueSkey DEBUG"
+  Write-Host "CreateSessionUri : $($CreateSessionUri)"
+  Write-Host "CreateRecordUri  : $($CreateRecordUri)"
+  Write-Host "Post             : $($Post)"
  }
 
- if (Test-Path -Path $SourcePath)
+ $AuthBody = @{'identifier' = $Identifier; 'password' = $ApiKey }
+ $Headers = @{}
+ $Headers.Add('Content-Type', 'application/json')
+
+ $Response = Invoke-RestMethod -Uri $CreateSessionUri -Method Post -Body ($AuthBody | ConvertTo-Json -Compress) -Headers $Headers
+ $Headers.Add('Authorization', "Bearer $($Response.accessJwt)")
+
+ if ($Message | Test-Json -ErrorAction Ignore)
  {
-  switch ($SourcePath.Extension)
+  $objMessage = $Message | ConvertFrom-Json
+  if ($objMessage.record -and $objMessage.repo)
   {
-   ".psd1"
+   # Message is a proper post, with a record and repo
+   $Post = $Message
+  }
+  elseif ($objMessage.record -and -not $objMessage.repo)
+  {
+   # We have a record but no post
+   if (!($objMessage.record.createdAt))
    {
-    $Module = Import-PowerShellDataFile -Path $SourcePath
-    $Version = $Module.ModuleVersion
-    $PowerShellGalleryUrl = "https://www.powershellgallery.com/packages/$($ProjectName)"
-    $Text = "Version $Version of $($ProjectName) released. Please visit Github ($($GitHubRepoUrl)) or PowerShellGallery.com ($($PowerShellGalleryUrl)) to download."
-    $embeds += New-Object -TypeName psobject -Property @{
-     '$type'       = 'app.bsky.embed.link'
-     'url'         = $PowerShellGalleryUrl
-     'title'       = "Nuget.org $($script:ProjectName)"
-     'description' = $project.Project.PropertyGroup.Description
-    }
+    # Missing createdAt
+    $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
+    $objMessage.record.createdAt = $createdAt
    }
-   ".csproj"
-   {
-    $Project = [xml](Get-Content -Path $SourcePath);
-    $Version = $Project.Project.PropertyGroup.Version.ToString();
-    $PackageId = $Project.Project.PropertyGroup.PackageId;
-    $NugetUrl = "https://nuget.org/packages/$PackageId"
-    $Text = "Version $Version of $($ProjectName) released. Please visit Github ($($GitHubRepoUrl)) or Nuget.org ($($NugetUrl)) to download."
-    $embeds += New-Object -TypeName psobject -Property @{
-     '$type'       = 'app.bsky.embed.link'
-     'url'         = $NugetUrl
-     'title'       = "Nuget.org $($script:ProjectName)"
-     'description' = $project.Project.PropertyGroup.Description
-    }
+   $Post = New-Object -TypeName psobject -Property @{
+    'repo'       = $Identifier
+    'collection' = 'app.bsky.feed.post'
+    record       = $objMessage.record
    }
   }
+  else
+  {
+   throw "Invalid Message, should either be plaintext, or bsky record, or bsky record containing a bsky repo"
+  }
+ }
+ else
+ {
+  # A Record needs to be created
   $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
   $Record = New-Object -TypeName psobject -Property @{
    '$type'     = "app.bsky.feed.post"
-   'text'      = $Text
+   'text'      = $Message
    "createdAt" = $createdAt
   }
   $Post = New-Object -TypeName psobject -Property @{
-   'repo'       = $Handle
+   'repo'       = $Identifier
    'collection' = 'app.bsky.feed.post'
    record       = $Record
-   embeds       = $embeds
   }
-
-  Invoke-RestMethod -Uri "https://bsky.social/xrpc/com.atproto.repo.createRecord" -Method Post -Body ($Post | ConvertTo-Json -Compress) -Headers $Headers
  }
+
+ Invoke-RestMethod -Uri $CreateRecordUri -Method Post -Body ($Post | ConvertTo-Json -Depth 10 -Compress) -Headers $Headers
 }
 catch
 {
- Write-Host "Error occurred: $($_.Exception.Message)"
+ $_.InvocationInfo | Out-String;
+ throw $_.Exception.Message;
 }
