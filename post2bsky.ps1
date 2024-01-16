@@ -1,5 +1,6 @@
 param (
- [string]$Message
+ [string]$Message,
+ [string]$Link
 )
 try
 {
@@ -33,43 +34,33 @@ try
  $Response = Invoke-RestMethod -Uri $CreateSessionUri -Method Post -Body ($AuthBody | ConvertTo-Json -Compress) -Headers $Headers
  $Headers.Add('Authorization', "Bearer $($Response.accessJwt)")
 
- if ($Message | Test-Json -ErrorAction Ignore)
+ $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
+
+ $Record = New-Object -TypeName psobject -Property @{
+  '$type'     = "app.bsky.feed.post"
+  'text'      = $Message
+  "createdAt" = $createdAt
+ }
+
+ if ($Links)
  {
-  $objMessage = $Message | ConvertFrom-Json
-  if ($objMessage.record -and $objMessage.repo)
+  $embeds = @()
+  foreach ($uri in $Link.Split(','))
   {
-   # Message is a proper post, with a record and repo
-   $Post = $Message
-  }
-  elseif ($objMessage.record -and -not $objMessage.repo)
-  {
-   # We have a record but no post
-   if (!($objMessage.record.createdAt))
-   {
-    # Missing createdAt
-    $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
-    $objMessage.record.createdAt = $createdAt
-   }
-   $Post = New-Object -TypeName psobject -Property @{
-    'repo'       = $Identifier
-    'collection' = 'app.bsky.feed.post'
-    record       = $objMessage.record
+   $embeds += New-Object -TypeName psobject -Property @{
+    '$type' = 'app.bsky.embed.link'
+    'url'   = $uri
    }
   }
-  else
-  {
-   throw "Invalid Message, should either be plaintext, or bsky record, or bsky record containing a bsky repo"
+  $Post = New-Object -TypeName psobject -Property @{
+   'repo'       = $Identifier
+   'collection' = 'app.bsky.feed.post'
+   record       = $Record
+   embeds       = $embeds
   }
  }
  else
  {
-  # A Record needs to be created
-  $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
-  $Record = New-Object -TypeName psobject -Property @{
-   '$type'     = "app.bsky.feed.post"
-   'text'      = $Message
-   "createdAt" = $createdAt
-  }
   $Post = New-Object -TypeName psobject -Property @{
    'repo'       = $Identifier
    'collection' = 'app.bsky.feed.post'
