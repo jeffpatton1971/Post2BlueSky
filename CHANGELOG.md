@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [[0.0.2.10]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.10) - 2024-01-17
+
+There was an issue between 2.7 and 2.10, basically I was misunderstanding byteEnd. This has been corrected, byteEnd is now the the last character in the string to be linked from the _start_ of the string. Originally this was just the length of the string replaced, this resulted in odd placements or no placements of the link.
+
+What's Changed:
+
+1. Updated the logic to add the startIndex to the endIndex for a proper byteEnd value in the json
+
+---
+
 ## [[0.0.2.7]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.7) - 2024-01-17
 
 This release corrects an issue with how the links were presented. The message retained the github markdown format which looked odd in a post, so it's been updated now to remove the markdown in favor of creating a link for just the word in the brackets

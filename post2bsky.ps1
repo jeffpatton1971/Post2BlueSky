@@ -83,7 +83,9 @@ try
    "createdAt" = $createdAt
    'facets'    = $Facets
   }
- }else{
+ }
+ else
+ {
   $Record = New-Object -TypeName psobject -Property @{
    '$type'     = "app.bsky.feed.post"
    'text'      = $Message
@@ -99,7 +101,7 @@ try
 
  if ($verbose.ToLower() -eq 'verbose')
  {
-  $Post |ConvertTo-Json -Depth 5
+  $Post | ConvertTo-Json -Depth 5
  }
 
  Invoke-RestMethod -Uri $CreateRecordUri -Method Post -Body ($Post | ConvertTo-Json -Depth 10 -Compress) -Headers $Headers
