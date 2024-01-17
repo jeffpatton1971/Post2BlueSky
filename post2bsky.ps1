@@ -45,10 +45,10 @@ try
   {
    $anchor = $Matches[1]
    $url = $Matches[2]
-   $Message = $Message.Replace($Matches[0], $anchor)
+   $Message = $Message.Replace($Matches[0], $url)
 
-   $startIndex = $Message.IndexOf($anchor)
-   $endIndex = $anchor.Length
+   $startIndex = $Message.IndexOf($url)
+   $endIndex = $url.Length
    $Links += New-Object -TypeName psobject -Property @{
     Name         = $anchor
     Url          = $url
