@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [[0.0.2.7]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.7) - 2024-01-17
+
+This release corrects an issue with how the links were presented. The message retained the github markdown format which looked odd in a post, so it's been updated now to remove the markdown in favor of creating a link for just the word in the brackets
+
+What's Changed:
+
+1. Added logic to process the message for each markdown block
+2. If the link is found
+   1. The link is replaced with the anchor word and the message is updated
+   2. The facet is created with the new location of the anchor in the message
+
+---
+
 ## [[0.0.2.6]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.6) - 2024-01-16
 
 This release makes the message a little more github friendly, links should be notated in github [markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#links).

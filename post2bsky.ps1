@@ -35,23 +35,31 @@ try
 
  $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
  $MarkdownLinkPattern = '\[([^\]]+)\]\((http[s]?://[^\s,)]+)\)'
- $LinkMatches = Select-String -Pattern $MarkdownLinkPattern -InputObject $Message -AllMatches | ForEach-Object { $_.Matches }
 
- if ($LinkMatches)
+ $Links = @()
+
+ do
  {
-  $Links = @()
-  foreach ($Match in $LinkMatches)
+  $result = $Message -match $MarkdownLinkPattern
+  if ($result)
   {
-   $startIndex = $Match.Index
-   $endIndex = $Match.Index + $Match.Length - 1
+   $anchor = $Matches[1]
+   $url = $Matches[2]
+   $Message = $Message.Replace($Matches[0], $anchor)
+
+   $startIndex = $Message.IndexOf($anchor)
+   $endIndex = $anchor.Length
    $Links += New-Object -TypeName psobject -Property @{
-    Name         = $Match.Groups[1].Value
-    Url          = $Match.Groups[2].Value
+    Name         = $anchor
+    Url          = $url
     "StartIndex" = $startIndex
     "EndIndex"   = $endIndex
    }
   }
+ } until ($result -eq $false)
 
+ if ($links)
+ {
   $Facets = @()
   foreach ($Link in $Links)
   {
@@ -75,9 +83,7 @@ try
    "createdAt" = $createdAt
    'facets'    = $Facets
   }
- }
- else
- {
+ }else{
   $Record = New-Object -TypeName psobject -Property @{
    '$type'     = "app.bsky.feed.post"
    'text'      = $Message
