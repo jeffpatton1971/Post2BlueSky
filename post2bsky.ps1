@@ -97,6 +97,11 @@ try
   record       = $Record
  }
 
+ if ($verbose.ToLower() -eq 'verbose')
+ {
+  $Post |ConvertTo-Json -Depth 5
+ }
+
  Invoke-RestMethod -Uri $CreateRecordUri -Method Post -Body ($Post | ConvertTo-Json -Depth 10 -Compress) -Headers $Headers
 }
 catch
