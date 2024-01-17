@@ -36,7 +36,7 @@ There a few different ways you could use this action, here is an example of one 
 ```yaml
 jobs:
   send_notification:
-    uses: mod-posh/Post2BlueSky@v0.0.2.9
+    uses: mod-posh/Post2BlueSky@v0.0.2.10
     with:
       message: '"This is a test post with a link to [github](https://www.github.com)"'
       verbose: 'verbose'
