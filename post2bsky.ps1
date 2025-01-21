@@ -20,7 +20,7 @@ try
 
  if ($verbose.ToLower() -eq 'verbose')
  {
-  Write-Host "Post2BlueSkey DEBUG"
+  Write-Host "Post2BlueSky DEBUG"
   Write-Host "CreateSessionUri : $($CreateSessionUri)"
   Write-Host "CreateRecordUri  : $($CreateRecordUri)"
   Write-Host "Message          : $($Message)"
@@ -66,11 +66,12 @@ try
  $Message | Select-String -Pattern $HashtagPattern -AllMatches | ForEach-Object {
   foreach ($Match in $_.Matches)
   {
+   $HashtagText = $Match.Value.TrimStart('#') # Remove the '#' prefix
    $startIndex = [System.Text.Encoding]::UTF8.GetBytes($Message.Substring(0, $Match.Index)).Length
    $endIndex = $startIndex + [System.Text.Encoding]::UTF8.GetBytes($Match.Value).Length
 
    $Hashtags += New-Object -TypeName psobject -Property @{
-    Hashtag     = $Match.Value
+    Tag         = $HashtagText
     "StartIndex" = $startIndex
     "EndIndex"   = $endIndex
    }
@@ -99,8 +100,8 @@ try
  {
   $features = @()
   $features += New-Object -TypeName psobject -Property @{
-   '$type' = "app.bsky.richtext.facet#hashtag"
-   'text'  = $Hashtag.Hashtag
+   '$type' = "app.bsky.richtext.facet#tag"
+   'tag'   = $Hashtag.Tag
   }
   $index = New-Object -TypeName psobject -Property @{
    "byteStart" = $Hashtag.StartIndex

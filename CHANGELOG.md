@@ -16,7 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 2. **Hashtag Facets**:
    - Added a new facet type: `app.bsky.richtext.facet#hashtag`.
+   - The # prefix is removed when constructing facets for hashtags.
+   - Hashtags are formatted with the app.bsky.richtext.facet#tag type, using the tag key.
    - Included all hashtags as facets in the `Record` object.
+   - Hashtags are stored as facets in the tag field.
 
 3. **Link and Hashtag Combination**:
    - Combined both link facets and hashtag facets into the `Facets` array.
