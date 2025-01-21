@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [[0.0.2.13]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.13) - 2025-01-21
+
+### **Changes Made**
+
+1. **Hashtag Detection**:
+   - Used the regex `#\w+` to identify hashtags in the `$Message`.
+   - Stored the detected hashtags with their start and end byte indices.
+
+2. **Hashtag Facets**:
+   - Added a new facet type: `app.bsky.richtext.facet#hashtag`.
+   - Included all hashtags as facets in the `Record` object.
+
+3. **Link and Hashtag Combination**:
+   - Combined both link facets and hashtag facets into the `Facets` array.
+
+---
+
+## [[0.0.2.12]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.12) - 2025-01-21
+
+Minor change, the message was not being passed in quoted, so messages were breaking in weird places. Additionally updated a typo in the documentation.
+
+---
+
 ## [[0.0.2.10]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.10) - 2024-01-17
 
 There was an issue between 2.7 and 2.10, basically I was misunderstanding byteEnd. This has been corrected, byteEnd is now the the last character in the string to be linked from the _start_ of the string. Originally this was just the length of the string replaced, this resulted in odd placements or no placements of the link.
@@ -66,18 +89,6 @@ What's Changed:
    3. If it's a proper bsky post object, it's posted
 3. Moved the apikey and identifier into env variables
 4. Added verbose logic
-
----
-
-## [[0.0.2.13]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.13) - 2025-01-21
-
-Markdown links not being parsed properly, adjusting encoding.
-
----
-
-## [[0.0.2.12]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.12) - 2025-01-21
-
-Minor change, the message was not being passed in quoted, so messages were breaking in weird places. Additionally updated a typo in the documentation.
 
 ---
 

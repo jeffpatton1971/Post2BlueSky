@@ -35,9 +35,12 @@ try
 
  $createdAt = Get-Date -Format "yyyy-MM-ddTHH:mm:ss.ffffffZ"
  $MarkdownLinkPattern = '\[([^\]]+)\]\((http[s]?://[^\s,)]+)\)'
+ $HashtagPattern = '#\w+'
 
  $Links = @()
+ $Hashtags = @()
 
+ # Process markdown links
  do
  {
   $result = $Message -match $MarkdownLinkPattern
@@ -59,25 +62,59 @@ try
   }
  } until ($result -eq $false)
 
- if ($links)
- {
-  $Facets = @()
-  foreach ($Link in $Links)
+ # Process hashtags
+ $Message | Select-String -Pattern $HashtagPattern -AllMatches | ForEach-Object {
+  foreach ($Match in $_.Matches)
   {
-   $features = @()
-   $features += New-Object -TypeName psobject -Property @{
-    '$type' = "app.bsky.richtext.facet#link"
-    'uri'   = $Link.Url
-   }
-   $index = New-Object -TypeName psobject -Property @{
-    "byteStart" = $Link.startIndex
-    "byteEnd"   = $Link.endIndex
-   }
-   $Facets += New-Object -TypeName psobject -Property @{
-    'index'    = $index
-    'features' = $features
+   $startIndex = [System.Text.Encoding]::UTF8.GetBytes($Message.Substring(0, $Match.Index)).Length
+   $endIndex = $startIndex + [System.Text.Encoding]::UTF8.GetBytes($Match.Value).Length
+
+   $Hashtags += New-Object -TypeName psobject -Property @{
+    Hashtag     = $Match.Value
+    "StartIndex" = $startIndex
+    "EndIndex"   = $endIndex
    }
   }
+ }
+
+ # Combine facets for links and hashtags
+ $Facets = @()
+ foreach ($Link in $Links)
+ {
+  $features = @()
+  $features += New-Object -TypeName psobject -Property @{
+   '$type' = "app.bsky.richtext.facet#link"
+   'uri'   = $Link.Url
+  }
+  $index = New-Object -TypeName psobject -Property @{
+   "byteStart" = $Link.startIndex
+   "byteEnd"   = $Link.endIndex
+  }
+  $Facets += New-Object -TypeName psobject -Property @{
+   'index'    = $index
+   'features' = $features
+  }
+ }
+ foreach ($Hashtag in $Hashtags)
+ {
+  $features = @()
+  $features += New-Object -TypeName psobject -Property @{
+   '$type' = "app.bsky.richtext.facet#hashtag"
+   'text'  = $Hashtag.Hashtag
+  }
+  $index = New-Object -TypeName psobject -Property @{
+   "byteStart" = $Hashtag.StartIndex
+   "byteEnd"   = $Hashtag.EndIndex
+  }
+  $Facets += New-Object -TypeName psobject -Property @{
+   'index'    = $index
+   'features' = $features
+  }
+ }
+
+ # Build the record object
+ if ($Facets.Count -gt 0)
+ {
   $Record = New-Object -TypeName psobject -Property @{
    '$type'     = "app.bsky.feed.post"
    'text'      = $Message
@@ -94,6 +131,7 @@ try
   }
  }
 
+ # Build the post object
  $Post = New-Object -TypeName psobject -Property @{
   'repo'       = $Identifier
   'collection' = 'app.bsky.feed.post'
