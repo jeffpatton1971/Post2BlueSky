@@ -47,8 +47,9 @@ try
    $url = $Matches[2]
    $Message = $Message.Replace($Matches[0], $anchor)
 
-   $startIndex = $Message.IndexOf($anchor)
-   $endIndex = $startIndex + $anchor.Length
+   $startIndex = [System.Text.Encoding]::UTF8.GetBytes($Message.Substring(0, $Message.IndexOf($anchor))).Length
+   $endIndex = $startIndex + [System.Text.Encoding]::UTF8.GetBytes($anchor).Length
+
    $Links += New-Object -TypeName psobject -Property @{
     Name         = $anchor
     Url          = $url

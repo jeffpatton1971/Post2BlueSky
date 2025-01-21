@@ -69,7 +69,13 @@ What's Changed:
 
 ---
 
-## [[0.0.2.12]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.12) - 2024-01-21
+## [[0.0.2.13]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.13) - 2025-01-21
+
+Markdown links not being parsed properly, adjusting encoding.
+
+---
+
+## [[0.0.2.12]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.12) - 2025-01-21
 
 Minor change, the message was not being passed in quoted, so messages were breaking in weird places. Additionally updated a typo in the documentation.
 
