@@ -25,7 +25,7 @@ You can trigger the `action.yml` by `workflow_call` to post a notification autom
 - `bluesky_api_key`: Your BlueSky App Password
 - `bluesky_identifier`: Your BlueSky Identifier, something like user.bsky.social
 
-## PowerShell Script (`issue2releasenotes.ps1`)
+## PowerShell Script (`post2bsky.ps1`)
 
 The PowerShell script constructs an authentication package to authenticate into the API. Once it has authenticated, it checks to see if the `Message` is a proper bsky record with repo or if it's a plain-text message. If it's a proper message it is posted; if it's missing a repo, one is constructed, and then the message is posted; and finally, if it's just a plain-text message, a record and repo are created and posted for you.
 
@@ -36,7 +36,7 @@ There a few different ways you could use this action, here is an example of one 
 ```yaml
 jobs:
   send_notification:
-    uses: mod-posh/Post2BlueSky@v0.0.2.10
+    uses: mod-posh/Post2BlueSky@v0.0.2.12
     with:
       message: '"This is a test post with a link to [github](https://www.github.com)"'
       verbose: 'verbose'

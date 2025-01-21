@@ -35,5 +35,5 @@ runs:
           BLUESKY_IDENTIFIER: ${{ inputs.bluesky_identifier }}
           VERBOSE: ${{ inputs.verbose }}
       run: |
-        & $env:GITHUB_ACTION_PATH\\post2bsky.ps1 -Message ${{ inputs.Message }}
+        & $env:GITHUB_ACTION_PATH\\post2bsky.ps1 -Message "${{ inputs.Message }}"
       shell: pwsh

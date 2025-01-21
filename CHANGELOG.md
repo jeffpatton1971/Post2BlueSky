@@ -69,6 +69,12 @@ What's Changed:
 
 ---
 
+## [[0.0.2.12]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.12) - 2024-01-21
+
+Minor change, the message was not being passed in quoted, so messages were breaking in weird places. Additionally updated a typo in the documentation.
+
+---
+
 ## [[0.0.2.0]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.0) - 2024-01-10
 
 This is a breaking change from previous versions, I have moved from Python to Powershell for the script. This allows me to easily test and work on these locally, as most of what I write is actually in PowerShell or C#.
