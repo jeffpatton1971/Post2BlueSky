@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [[0.0.2.13]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.2.13) - 2025-01-21
+## [[0.0.2.13]](https://github.com/mod-posh/Post2Bluesky/releases/tag/v0.0.3.0) - 2025-01-21
 
 ### **Changes Made**
 
